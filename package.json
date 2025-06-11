@@ -17,12 +17,17 @@
   "scripts": {
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
+    "eslint:fix": "npx eslint . --fix",
+    "eslint:check": "npx eslint .",
     "dev": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.28.0",
     "@types/node": "^24.0.0",
+    "eslint": "^9.28.0",
     "prettier": "3.5.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0"
   }
 }

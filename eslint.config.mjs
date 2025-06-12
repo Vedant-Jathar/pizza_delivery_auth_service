@@ -10,8 +10,6 @@ export default tseslint.config(
         ignores: ["node_modules", "dist", "eslint.config.mjs"],
     },
     {
-
-
         languageOptions: {
             parserOptions: {
                 projectService: true,
@@ -19,6 +17,7 @@ export default tseslint.config(
             },
         },
         rules: {
+            // "no-console": "error",
             "dot-notation": "error"
         }
     },

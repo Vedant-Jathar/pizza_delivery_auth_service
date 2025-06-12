@@ -1,10 +1,4 @@
-function addTwoNums(a: number, b: number) {
-  console.log(a + b)
-  console.log('budvbchjd')
-  const user = {
-    age: 56,
-  }
-  console.log(user.age)
-}
+import { Config } from './config/index.js'
 
-addTwoNums(4, 5)
+console.log(Config.PORT)
+console.log(Config.NODE_ENV)

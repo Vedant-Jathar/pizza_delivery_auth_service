@@ -1,4 +1,17 @@
-import { Config } from './config/index.js'
+import { Config } from './config'
+import app from './app'
 
-console.log(Config.PORT)
-console.log(Config.NODE_ENV)
+const startServer = () => {
+  try {
+    console.log('Vedant')
+    console.log('Vedant')
+
+    app.listen(Config.PORT, () =>
+      console.log(`Server listening on PORT ${Config.PORT}`),
+    )
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+startServer()

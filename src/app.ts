@@ -1,10 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express'
 import createHttpError, { HttpError } from 'http-errors'
 import logger from './config/logger'
+import authRouter from './routes/authRoutes'
 
 const app = express()
 
 app.use(express.json())
+
+app.use('/auth', authRouter)
 
 // eslint-disable-next-line @typescript-eslint/require-await
 app.get('/', async (req, res, next) => {

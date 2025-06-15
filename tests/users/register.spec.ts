@@ -4,6 +4,8 @@ import request from 'supertest'
 describe('POST /auth/register', () => {
   describe('Given all Fields', () => {
     it('Should return status code 201(Created)', async () => {
+      // console.log(process.env.DB_NAME);
+
       // AAA (Arrange, Act ,Assert)
       // Arrange:
       const userData = {

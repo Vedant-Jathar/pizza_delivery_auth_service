@@ -9,6 +9,7 @@ const startServer = () => {
         port: Config.PORT,
       })
     })
+    console.log(process.env.DB_NAME)
   } catch (error) {
     console.error(error)
   }

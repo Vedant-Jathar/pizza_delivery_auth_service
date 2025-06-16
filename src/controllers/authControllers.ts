@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express'
 import { RegisterUserRequest } from '../types'
 import { UserService } from '../services/userService'
 import { Logger } from 'winston'
+import { Role } from '../constants'
 
 export class AuthControllers {
   constructor(
@@ -25,6 +26,7 @@ export class AuthControllers {
         lastName,
         email,
         password,
+        role: Role.CUSTOMER,
       })
       this.logger.info('User created successfully', { userDetails: user })
 

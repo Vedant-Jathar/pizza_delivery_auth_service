@@ -10,9 +10,9 @@ export const AppDataSource = new DataSource({
   username: Config.DB_USERNAME,
   password: Config.DB_PASSWORD,
   database: Config.DB_NAME,
-  // "synchronize:true" means that the database models would be created without manually migrating them
+  // synchrnize means that the database models would be created without manually migrating them
   // Dont use synchronize in production
-  synchronize: Config.NODE_ENV === 'test' || Config.NODE_ENV === 'dev',
+  synchronize: true,
   logging: false,
   entities: [User],
   migrations: [],

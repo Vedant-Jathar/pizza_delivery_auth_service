@@ -3,6 +3,7 @@ import { RegisterUserRequest } from '../types'
 import { UserService } from '../services/userService'
 import { Logger } from 'winston'
 import { Role } from '../constants'
+// import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {
   constructor(

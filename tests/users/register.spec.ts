@@ -17,10 +17,6 @@ describe('POST /auth/register', () => {
     // await truncateTables(connection)
     await connection.dropDatabase()
     await connection.synchronize()
-
-    // const userRepo = connection.getRepository(User)
-    // const users = userRepo.find()
-    // console.log("Users", users);
   })
 
   afterAll(async () => {
@@ -28,7 +24,7 @@ describe('POST /auth/register', () => {
   })
 
   describe('Given all Fields', () => {
-    it('Should return status code 201(Created)', async () => {
+    it('should return status code 201(Created) when a user is successfully created', async () => {
       // console.log(process.env.DB_NAME);
 
       // AAA (Arrange, Act ,Assert)
@@ -47,7 +43,7 @@ describe('POST /auth/register', () => {
       expect(response.statusCode).toBe(201)
     })
 
-    it('Should return response as json', async () => {
+    it('should return response as json', async () => {
       // AAA (Arrange, Act ,Assert)
       // Arrange:
       const userData = {
@@ -167,5 +163,83 @@ describe('POST /auth/register', () => {
     })
   })
 
-  describe('Some field missing', () => {})
+  describe('Some field missing', () => {
+    it('should send status 400 if email field is missing', async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: '',
+        password: 'ved@123',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+
+    it('should send status 400 if email has a invalid format ', async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: 'ved&gmail.com',
+        password: 'ved@123',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+
+    it("should send status 400 if password doesn't have the minimum length", async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: 'jatharvedant16@gmail.com',
+        password: 'ved',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+
+    it('should send status 400 any one of the fields has incorrect format', async () => {
+      // Arrange:
+      const userData = {
+        firstName: '',
+        lastName: '',
+        email: 'jath',
+        password: 'ved',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+
+      console.log(response.body)
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+  })
 })

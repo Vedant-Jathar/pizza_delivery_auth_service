@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm'
 // import { truncateTables } from '../utils'
 import { User } from '../../src/entity/User'
 import { Role } from '../../src/constants'
+import { isJwt } from '../utils'
 
 describe('POST /auth/register', () => {
   let connection: DataSource
@@ -161,6 +162,41 @@ describe('POST /auth/register', () => {
       expect(response.status).toBe(400)
       expect(users).toHaveLength(1)
     })
+
+    it('should return the access token and refresh token inside a cookie', async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: 'jatharvedant16@gmail.com',
+        password: 'ved@123',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      let accessToken = null
+      let refreshToken = null
+      const cookies =
+        (response.headers['set-cookie'] as unknown as string[]) ?? []
+
+      cookies.forEach((cookie) => {
+        if (cookie.startsWith('accessToken=')) {
+          accessToken = cookie.split(';')[0].split('=')[1]
+        }
+
+        if (cookie.startsWith('refreshToken=')) {
+          refreshToken = cookie.split(';')[0].split('=')[1]
+        }
+      })
+
+      expect(accessToken).not.toBeNull()
+      expect(refreshToken).not.toBeNull()
+
+      expect(isJwt(accessToken)).toBeTruthy()
+      expect(isJwt(refreshToken)).toBeTruthy()
+    })
   })
 
   describe('Some field missing', () => {
@@ -182,7 +218,63 @@ describe('POST /auth/register', () => {
       expect(response.status).toBe(400)
       expect(users).toHaveLength(0)
     })
+    it('should send status 400 if first name is missing', async () => {
+      // Arrange:
+      const userData = {
+        firstName: '',
+        lastName: 'Jathar',
+        email: 'ved@gmail.com',
+        password: 'ved@123',
+      }
 
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+    it('should send status 400 if last name is missing', async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: '',
+        email: 'ved@gmail.com',
+        password: 'ved@123',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+    it('should send status 400 if password is missing', async () => {
+      // Arrange:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: 'ved@gmail.com',
+        password: '',
+      }
+
+      // Act:
+      const response = await request(app).post('/auth/register').send(userData)
+
+      // Assert:
+      const userRepo = connection.getRepository(User)
+      const users = await userRepo.find()
+      expect(response.status).toBe(400)
+      expect(users).toHaveLength(0)
+    })
+  })
+
+  describe('Some fields have invalid format', () => {
     it('should send status 400 if email has a invalid format ', async () => {
       // Arrange:
       const userData = {
@@ -234,12 +326,28 @@ describe('POST /auth/register', () => {
       const response = await request(app).post('/auth/register').send(userData)
 
       // Assert:
-
-      console.log(response.body)
       const userRepo = connection.getRepository(User)
       const users = await userRepo.find()
       expect(response.status).toBe(400)
       expect(users).toHaveLength(0)
     })
+
+    // it("should sanitize the email field by trimming spaces at the front and back", async () => {
+    //   // Arrange:
+    //   const userData = {
+    //     firstName: "Vedant",
+    //     lastName: "Jathar",
+    //     email: "  ved@gmail.com ",
+    //     password: "ved@1234"
+    //   }
+
+    //   // Act
+    //   await request(app).post('/auth/register').send(userData)
+
+    //   // Assert:
+    //   const userRepo = connection.getRepository(User)
+    //   const users = await userRepo.find()
+    //   expect(users[0].email).toBe("ved@gmail.com")
+    // })
   })
 })

@@ -18,16 +18,6 @@ const logger = winston.createLogger({
     serviceName: 'authService',
   },
   transports: [
-    new winston.transports.Console({
-      level: 'info',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-        winston.format.prettyPrint(),
-      ),
-      // silent: Config.NODE_ENV === 'test',
-    }),
-
     new winston.transports.File({
       level: 'debug',
       format: winston.format.combine(

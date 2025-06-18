@@ -8,3 +8,21 @@ export const truncateTables = async (connection: DataSource) => {
     await repository.clear()
   }
 }
+
+export const isJwt = (token: string | null) => {
+  if (!token) return false
+  const parts = token.split('.')
+  if (parts.length !== 3) return false
+
+  try {
+    const [headerB64, payloadB64] = parts
+
+    JSON.parse(Buffer.from(headerB64, 'base64').toString('utf-8'))
+    JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf-8'))
+
+    return true
+  } catch (err) {
+    console.log('The access token is not a jwt token')
+    if (err) return false
+  }
+}

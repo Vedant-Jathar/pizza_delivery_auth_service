@@ -1,10 +1,12 @@
 import { NextFunction, Response } from 'express'
-import { RegisterUserRequest } from '../types'
+import { LoginUserRequest, RegisterUserRequest } from '../types'
 import { UserService } from '../services/userService'
 import { Logger } from 'winston'
 import { Role } from '../constants'
 import { JwtPayload } from 'jsonwebtoken'
 import { TokenService } from '../services/tokenService'
+import createHttpError from 'http-errors'
+import bcrypt from 'bcrypt'
 // import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {
@@ -67,6 +69,72 @@ export class AuthControllers {
 
       res.status(201).json({
         id: user.id,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async login(req: LoginUserRequest, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body
+
+      this.logger.info('New request to login a user', {
+        email,
+        password: '*************',
+      })
+
+      // Checking whether user exists:
+      const user = await this.userService.findUserByEmail(email)
+      if (!user) {
+        const err = createHttpError(400, 'User does not exist')
+        next(err)
+      }
+
+      // Checking whether the password is correct:
+      const hashedPassword = user.password
+      const hasPasswordMatched = await bcrypt.compare(password, hashedPassword)
+
+      if (!hasPasswordMatched) {
+        const err = createHttpError(400, 'Incorrect password')
+        throw err
+      }
+
+      const payload: JwtPayload = {
+        sub: String(user.id),
+        role: String(user.role),
+      }
+
+      const accessToken = this.tokenService.generateAccessToken(payload)
+
+      const newRefreshToken = await this.tokenService.persistRefreshToken(user)
+
+      const refreshToken = this.tokenService.generateRefreshToken({
+        ...payload,
+        id: newRefreshToken.id,
+      })
+
+      res.cookie('accessToken', accessToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        domain: 'localhost',
+      })
+
+      res.cookie('refreshToken', refreshToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        domain: 'localhost',
+      })
+
+      this.logger.info('user logged in successfully', {
+        id: user.id,
+      })
+
+      res.status(200).json({
+        id: user.id,
+        message: 'Login successful',
       })
     } catch (error) {
       next(error)

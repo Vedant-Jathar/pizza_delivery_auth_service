@@ -17,6 +17,11 @@ export const registerSchema = z.object({
     .min(6, 'Min 6 characters required'),
 })
 
+export const loginSchema = z.object({
+  email: z.string().nonempty('Email is required').email(),
+  password: z.string().nonempty('Password is required'),
+})
+
 export const validate =
   (schema: AnyZodObject) =>
   (req: RegisterUserRequest, res: Response, next: NextFunction) => {

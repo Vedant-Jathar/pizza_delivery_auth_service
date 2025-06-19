@@ -3,16 +3,15 @@ import { RegisterUserRequest } from '../types'
 import { UserService } from '../services/userService'
 import { Logger } from 'winston'
 import { Role } from '../constants'
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import fs from 'fs'
-import path from 'path'
-import { Config } from '../config'
+import { JwtPayload } from 'jsonwebtoken'
+import { TokenService } from '../services/tokenService'
 // import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {
   constructor(
     private userService: UserService,
     private logger: Logger,
+    private tokenService: TokenService,
   ) {}
 
   async register(req: RegisterUserRequest, res: Response, next: NextFunction) {
@@ -35,25 +34,21 @@ export class AuthControllers {
       })
       this.logger.info('User created successfully', { userDetails: user })
 
-      const privateKey = fs.readFileSync(
-        path.join(__dirname, '../../certs/privateKey'),
-      )
-
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
       }
 
-      const accessToken = jwt.sign(payload, privateKey, {
-        algorithm: 'RS256',
-        expiresIn: '1h',
-        issuer: 'auth-service',
-      })
+      // Generating access token:
+      const accessToken = this.tokenService.generateAccessToken(payload)
 
-      const refreshToken = jwt.sign(payload, Config.REFRESH_TOKEN_SECRET!, {
-        algorithm: 'HS256',
-        expiresIn: '1y',
-        issuer: 'auth-service',
+      // Saving a refresh token record to the database:(ie persisting the refresh token)
+      const newRefreshToken = await this.tokenService.persistRefreshToken(user)
+
+      // Generating a refresh token:(It has the id of the refresh token record stored to the database)
+      const refreshToken = this.tokenService.generateRefreshToken({
+        ...payload,
+        id: newRefreshToken.id,
       })
 
       res.cookie('accessToken', accessToken, {

@@ -5,6 +5,8 @@ import { AppDataSource } from '../config/data-source'
 import { User } from '../entity/User'
 import logger from '../config/logger'
 import { registerSchema, validate } from '../validators/registerValidator'
+import { TokenService } from '../services/tokenService'
+import { RefreshToken } from '../entity/RefreshToken'
 // import { registerSchema, validate } from '../validators/registerValidator'
 
 const authRouter = Router()
@@ -12,6 +14,7 @@ const authRouter = Router()
 const authController = new AuthControllers(
   new UserService(AppDataSource.getRepository(User)),
   logger,
+  new TokenService(AppDataSource.getRepository(RefreshToken)),
 )
 
 authRouter.post(

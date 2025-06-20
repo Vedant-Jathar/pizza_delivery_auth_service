@@ -3,10 +3,12 @@ import express, { NextFunction, Request, Response } from 'express'
 import createHttpError, { HttpError } from 'http-errors'
 import logger from './config/logger'
 import authRouter from './routes/authRoutes'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use('/auth', authRouter)
 

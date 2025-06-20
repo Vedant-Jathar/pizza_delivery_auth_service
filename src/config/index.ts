@@ -14,6 +14,7 @@ const {
   REFRESH_TOKEN_SECRET,
   ACCESS_TOKEN_EXPIRY,
   REFRESH_TOKEN_EXPIRY,
+  JWKS_URI,
 } = process.env
 
 export const Config = {
@@ -27,4 +28,5 @@ export const Config = {
   REFRESH_TOKEN_SECRET,
   ACCESS_TOKEN_EXPIRY,
   REFRESH_TOKEN_EXPIRY,
+  JWKS_URI,
 }

@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express'
-import { LoginUserRequest, RegisterUserRequest } from '../types'
+import { Auth, LoginUserRequest, RegisterUserRequest } from '../types'
 import { UserService } from '../services/userService'
 import { Logger } from 'winston'
 import { Role } from '../constants'
@@ -135,6 +135,21 @@ export class AuthControllers {
       res.status(200).json({
         id: user.id,
         message: 'Login successful',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async self(req: Auth, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.findUserById(Number(req.auth.sub))
+      if (!user) {
+        const err = createHttpError(404, 'user not found')
+        next(err)
+      }
+      res.json({
+        id: user!.id,
       })
     } catch (error) {
       next(error)

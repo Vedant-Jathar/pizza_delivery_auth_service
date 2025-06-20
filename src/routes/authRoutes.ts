@@ -4,6 +4,8 @@ import { UserService } from '../services/userService'
 import { AppDataSource } from '../config/data-source'
 import { User } from '../entity/User'
 import logger from '../config/logger'
+import authenticate from '../middlewares/authenticate'
+import { Auth } from '../types'
 import {
   loginSchema,
   registerSchema,
@@ -33,6 +35,14 @@ authRouter.post(
   validate(loginSchema),
   (req: Request, res: Response, next: NextFunction) =>
     authController.login(req, res, next),
+)
+
+authRouter.get(
+  '/self',
+  authenticate,
+  async (req: Request, res: Response, next: NextFunction) => {
+    await authController.self(req as Auth, res, next)
+  },
 )
 
 export default authRouter

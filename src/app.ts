@@ -30,7 +30,7 @@ app.get('/vedant', (req: Request, res: Response) => {
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   logger.error(err.message)
 
-  res.status(err.statusCode || 500).json({
+  res.status(err.statusCode || 600).json({
     errors: [
       {
         type: err.name,

@@ -48,11 +48,36 @@ describe('GET /auth/self', () => {
       // Expecting
       expect((response.body as Record<string, string>).id).toBe(user.id)
     })
+
+    it('should not return password in the user data', async () => {
+      // Register the user:
+      const userData = {
+        firstName: 'Vedant',
+        lastName: 'Jathar',
+        email: 'jatharvedant16@gmail.com',
+        password: 'ved@123',
+      }
+      const userRepo = connection.getRepository(User)
+      const user = await userRepo.save({ ...userData, role: Role.CUSTOMER })
+
+      // Create a access token that will be sent with the request:
+      const accessToken = jwks.token({ sub: String(user.id), role: user.role })
+
+      // Sending the request to get self and also setting the cookie
+      const response = await request(app)
+        .get('/auth/self')
+        .set('Cookie', `accessToken=${accessToken}`)
+
+      // Expecting
+      expect(response.body as Record<string, string>).not.toHaveProperty(
+        'passsord',
+      )
+    })
   })
 
   describe('If user does not exist', () => {
     it('should return status code 404 if user not found', async () => {
-      const accesToken = jwks.token({ sub: '1', role: Role.CUSTOMER })
+      const accesToken = jwks.token({ sub: '5666', role: Role.CUSTOMER })
       const response = await request(app)
         .get('/auth/self')
         .set('Cookie', `accessToken=${accesToken}`)

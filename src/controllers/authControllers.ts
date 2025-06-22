@@ -202,8 +202,16 @@ export class AuthControllers {
     }
   }
 
-  // async logout(req: Request, res: Response, next: NextFunction) {
-
-  //   res.json({})
-  // }
+  async logout(req: Auth, res: Response, next: NextFunction) {
+    try {
+      await this.tokenService.deleteOldRefreshTokenFromDatabase(
+        Number(req.auth.id),
+      )
+      res.clearCookie('accessToken')
+      res.clearCookie('refreshToken')
+      res.json({})
+    } catch (error) {
+      next(error)
+    }
+  }
 }

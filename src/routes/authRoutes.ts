@@ -14,6 +14,7 @@ import {
 import { TokenService } from '../services/tokenService'
 import { RefreshToken } from '../entity/RefreshToken'
 import validaterefreshToken from '../middlewares/validaterefreshToken'
+import parserefreshToken from '../middlewares/parserefreshToken'
 // import { registerSchema, validate } from '../validators/registerValidator'
 
 const authRouter = Router()
@@ -54,8 +55,14 @@ authRouter.post(
   },
 )
 
-// authRouter.post("/logout", authenticate, (req: Request, res: Response, next: NextFunction) => {
-//   authController.logout(req, res, next)
-// })
+// We need "parserefreshToken" to be a middleware in logout since we want the "id" of the "refreshTokenInDatabase" in "req.auth.id" so that then we can delete the refreshTokenInDatabase
+authRouter.post(
+  '/logout',
+  authenticate,
+  parserefreshToken,
+  async (req: Request, res: Response, next: NextFunction) => {
+    await authController.logout(req as Auth, res, next)
+  },
+)
 
 export default authRouter

@@ -1,8 +1,7 @@
 import winston from 'winston'
+
 // import { Config } from '.'
-
 // The following are the levels defined by Syslog in descending order of severity:
-
 // Emergency (emerg): indicates that the system is unusable and requires immediate attention.
 // Alert (alert): indicates that immediate action is necessary to resolve a critical issue.
 // Critical (crit): signifies critical conditions in the program that demand intervention to prevent system failure.
@@ -18,14 +17,14 @@ const logger = winston.createLogger({
     serviceName: 'authService',
   },
   transports: [
-    new winston.transports.Console({
-      level: 'info',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-        winston.format.prettyPrint(),
-      ),
-    }),
+    // new winston.transports.Console({
+    //   level: 'info',
+    //   format: winston.format.combine(
+    //     winston.format.timestamp(),
+    //     winston.format.json(),
+    //     winston.format.prettyPrint(),
+    //   ),
+    // }),
     new winston.transports.File({
       level: 'debug',
       format: winston.format.combine(

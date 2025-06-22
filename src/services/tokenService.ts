@@ -11,7 +11,7 @@ export class TokenService {
   constructor(private refreshTokenRepo: Repository<RefreshToken>) {}
   generateAccessToken(payload: JwtPayload) {
     const privateKey = fs.readFileSync(
-      path.join(__dirname, '../../certs/privateKey'),
+      path.join(__dirname, '../../certs/privateKey.pem'),
     )
     const accessToken = jwt.sign(payload, privateKey, {
       algorithm: 'RS256',
@@ -39,5 +39,9 @@ export class TokenService {
       expiresAt: new Date(Date.now() + yearInMilliseconds),
     })
     return newRefreshToken
+  }
+
+  async deleteOldRefreshTokenFromDatabase(id: number) {
+    await this.refreshTokenRepo.delete({ id })
   }
 }

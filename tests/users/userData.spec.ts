@@ -2,7 +2,7 @@ import request from 'supertest'
 import app from '../../src/app'
 import createJWKSMock from 'mock-jwks'
 import { DataSource } from 'typeorm'
-import { AppDataSource } from '../../src/config/data-source'
+import AppDataSource from '../../src/config/data-source'
 import { User } from '../../src/entity/User'
 import { Role } from '../../src/constants'
 
@@ -25,7 +25,7 @@ describe('GET /auth/self', () => {
     jwks.stop()
   })
 
-  describe('If user exists', () => {
+  describe('happy path', () => {
     it('should return user id if the access token is valid and not expired', async () => {
       // Register the user:
       const userData = {
@@ -75,7 +75,7 @@ describe('GET /auth/self', () => {
     })
   })
 
-  describe('If user does not exist', () => {
+  describe('sad paths', () => {
     it('should return status code 404 if user not found', async () => {
       const accesToken = jwks.token({ sub: '5666', role: Role.CUSTOMER })
       const response = await request(app)
@@ -83,6 +83,12 @@ describe('GET /auth/self', () => {
         .set('Cookie', `accessToken=${accesToken}`)
         .send()
       expect(response.status).toBe(404)
+    })
+
+    it('should return status 401 if acces token is not sent with the request', async () => {
+      const response = await request(app).get('/auth/self')
+
+      expect(response.status).toBe(401)
     })
   })
 })

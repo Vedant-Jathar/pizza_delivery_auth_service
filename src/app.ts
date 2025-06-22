@@ -6,7 +6,7 @@ import authRouter from './routes/authRoutes'
 import cookieParser from 'cookie-parser'
 
 const app = express()
-
+app.use(express.static('public'))
 app.use(express.json())
 app.use(cookieParser())
 
@@ -30,7 +30,7 @@ app.get('/vedant', (req: Request, res: Response) => {
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   logger.error(err.message)
 
-  res.status(err.statusCode || 600).json({
+  res.status(err.statusCode || err.status || 500).json({
     errors: [
       {
         type: err.name,

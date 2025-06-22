@@ -93,6 +93,9 @@ out
 # Keys(for signing accestoken and refresh token)
 certs/
 
+# The public files shouldnt be pushed to the repo
+public/
+
 # Nuxt.js build / generate output
 .nuxt
 dist

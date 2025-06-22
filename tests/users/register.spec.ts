@@ -1,6 +1,6 @@
 import app from '../../src/app'
 import request from 'supertest'
-import { AppDataSource } from '../../src/config/data-source'
+import AppDataSource from '../../src/config/data-source'
 import { DataSource } from 'typeorm'
 // import { truncateTables } from '../utils'
 import { User } from '../../src/entity/User'
@@ -42,7 +42,7 @@ describe('POST /auth/register', () => {
       const response = await request(app).post('/auth/register').send(userData)
 
       // Assert:
-      expect(response.statusCode).toBe(201)
+      expect(response.status).toBe(201)
     })
 
     it('should return response as json', async () => {

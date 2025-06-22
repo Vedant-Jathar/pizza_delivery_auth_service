@@ -107,11 +107,14 @@ export class AuthControllers {
 
       const accessToken = this.tokenService.generateAccessToken(payload)
 
-      const newRefreshToken = await this.tokenService.persistRefreshToken(user)
+      const RefreshTokenInDatabase =
+        await this.tokenService.persistRefreshToken(user)
+
+      console.log('RefreshTokenInDatabase', RefreshTokenInDatabase)
 
       const refreshToken = this.tokenService.generateRefreshToken({
         ...payload,
-        id: newRefreshToken.id,
+        id: RefreshTokenInDatabase.id,
       })
 
       res.cookie('accessToken', accessToken, {
@@ -157,4 +160,50 @@ export class AuthControllers {
       next(error)
     }
   }
+
+  async refresh(req: Auth, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.findUserById(Number(req.auth.sub))
+      const payload: JwtPayload = {
+        sub: String(user?.id),
+        role: String(user?.role),
+      }
+
+      const accessToken = this.tokenService.generateAccessToken(payload)
+
+      const newRefreshToken = await this.tokenService.persistRefreshToken(user!)
+
+      await this.tokenService.deleteOldRefreshTokenFromDatabase(
+        Number(req.auth.id),
+      )
+
+      const refreshToken = this.tokenService.generateRefreshToken({
+        ...payload,
+        id: newRefreshToken.id,
+      })
+
+      res.cookie('accessToken', accessToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        domain: 'localhost',
+      })
+
+      res.cookie('refreshToken', refreshToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+        domain: 'localhost',
+      })
+
+      res.json({})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  // async logout(req: Request, res: Response, next: NextFunction) {
+
+  //   res.json({})
+  // }
 }

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm'
-import { AppDataSource } from '../../src/config/data-source'
+import AppDataSource from '../../src/config/data-source'
 import request from 'supertest'
 import app from '../../src/app'
 import { isJwt } from '../utils'

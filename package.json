@@ -24,7 +24,7 @@
     "prepare": "husky",
     "start": "ts-node src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate src/migration/migration -d src/config/data-source.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/config/data-source.ts",
     "migration:run": "npx typeorm-ts-node-commonjs migration:run -d src/config/data-source.ts",
     "migration:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/config/data-source.ts",
     "migration:create":"typeorm-ts-node-commonjs migration:generate src/migration/migration"

@@ -76,6 +76,29 @@ describe('POST /tenants', () => {
       const response = await request(app).post('/tenants').send(TenantData)
 
       expect(response.status).toBe(401)
+
+      const tenantRepo = connection.getRepository(Tenant)
+      const tenants = await tenantRepo.find()
+      expect(tenants).toHaveLength(0)
+    })
+    it('should send status 403 if the user is not an admin', async () => {
+      const TenantData = {
+        name: 'Tenant name',
+        address: 'Tenant address',
+      }
+
+      const accessToken = jwks.token({ sub: '1', role: Role.MANAGER })
+
+      const response = await request(app)
+        .post('/tenants')
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send(TenantData)
+
+      expect(response.status).toBe(403)
+
+      const tenantRepo = connection.getRepository(Tenant)
+      const tenants = await tenantRepo.find()
+      expect(tenants).toHaveLength(0)
     })
   })
 })

@@ -6,6 +6,8 @@ import { TenantService } from '../services/tenantService'
 import AppDataSource from '../config/data-source'
 import { Tenant } from '../entity/Tenant'
 import authenticate from '../middlewares/authenticate'
+import { canAccess } from '../middlewares/canAccess'
+import { Role } from '../constants'
 
 const router = Router()
 
@@ -17,6 +19,7 @@ const tenantController = new TenantController(
 router.post(
   '/',
   authenticate,
+  canAccess([Role.ADMIN]),
   (req: Request, res: Response, next: NextFunction) =>
     tenantController.create(req, res, next),
 )

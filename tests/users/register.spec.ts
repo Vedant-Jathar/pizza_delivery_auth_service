@@ -96,7 +96,7 @@ describe('POST /auth/register', () => {
       // Act:
       const response = await request(app).post('/auth/register').send(userData)
 
-      console.log('response.body', response.body)
+      // console.log('response.body', response.body)
 
       // Assert:
       expect(response.body).toHaveProperty('id')

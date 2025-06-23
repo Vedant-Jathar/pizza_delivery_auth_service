@@ -4,6 +4,7 @@ import createHttpError, { HttpError } from 'http-errors'
 import logger from './config/logger'
 import authRouter from './routes/authRoutes'
 import cookieParser from 'cookie-parser'
+import tenantRouter from './routes/tenantRoutes'
 
 const app = express()
 app.use(express.static('public'))
@@ -11,6 +12,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use('/auth', authRouter)
+app.use('/tenants', tenantRouter)
 
 // eslint-disable-next-line @typescript-eslint/require-await
 app.get('/', async (req, res, next) => {

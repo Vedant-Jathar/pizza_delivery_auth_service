@@ -110,8 +110,6 @@ export class AuthControllers {
       const RefreshTokenInDatabase =
         await this.tokenService.persistRefreshToken(user)
 
-      console.log('RefreshTokenInDatabase', RefreshTokenInDatabase)
-
       const refreshToken = this.tokenService.generateRefreshToken({
         ...payload,
         id: RefreshTokenInDatabase.id,

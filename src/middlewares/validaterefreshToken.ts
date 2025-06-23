@@ -26,7 +26,7 @@ export default expressjwt({
           },
         },
       })
-      console.log('Refresh Token in Database:', refreshTokenInDatabase)
+      // console.log('Refresh Token in Database:', refreshTokenInDatabase)
 
       return refreshTokenInDatabase === null
     } catch (err) {

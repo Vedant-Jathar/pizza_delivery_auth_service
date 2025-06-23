@@ -39,3 +39,8 @@ export interface RefreshTokenPayload {
   sub: string
   role: string
 }
+
+export type TenantData = {
+  name: string
+  address: string
+}

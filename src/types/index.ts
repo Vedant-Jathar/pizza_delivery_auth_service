@@ -44,3 +44,9 @@ export type TenantData = {
   name: string
   address: string
 }
+
+export interface epxressResponseTenant {
+  id: number
+  name: string
+  address: string
+}

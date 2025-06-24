@@ -8,6 +8,8 @@ import { Tenant } from '../entity/Tenant'
 import authenticate from '../middlewares/authenticate'
 import { canAccess } from '../middlewares/canAccess'
 import { Role } from '../constants'
+import { tenantDataSchema } from '../validators/tenantValidator'
+import { validate } from '../validators/registerValidator'
 
 const router = Router()
 
@@ -20,8 +22,33 @@ router.post(
   '/',
   authenticate,
   canAccess([Role.ADMIN]),
+  validate(tenantDataSchema),
   (req: Request, res: Response, next: NextFunction) =>
     tenantController.create(req, res, next),
+)
+
+router.get(
+  '/:id',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getTenantById(req, res, next),
+)
+
+router.patch(
+  '/:id',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.updateTenantById(req, res, next),
+)
+
+router.delete(
+  '/:id',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.deleteTenantById(req, res, next),
 )
 
 export default router

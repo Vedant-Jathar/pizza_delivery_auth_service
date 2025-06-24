@@ -5,8 +5,6 @@ import { Auth } from '../types'
 export const canAccess = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('can member acecss')
-
       const _req = req as Auth
       const roleFromToken = _req.auth.role
       if (!roles.includes(roleFromToken)) {

@@ -107,13 +107,11 @@ describe('POST /tenants', () => {
         .set('Cookie', [`accessToken=${accessToken}`])
         .send(TenantData)
 
-      const oldTenant = await tenanatRepo.findOne({
+      await tenanatRepo.findOne({
         where: {
           id: (tenant.body as epxressResponseTenant).id,
         },
       })
-
-      console.log('Ole tenanat', oldTenant)
 
       const updateData = {
         name: 'falana',
@@ -130,8 +128,6 @@ describe('POST /tenants', () => {
           id: (tenant.body as epxressResponseTenant).id,
         },
       })
-
-      console.log('updatedTenant', updatedTenant)
 
       expect(updatedTenant?.name).toBe(updateData.name)
       expect(updatedTenant?.address).toBe(updateData.address)
@@ -160,7 +156,6 @@ describe('POST /tenants', () => {
           id: (tenant.body as epxressResponseTenant).id,
         },
       })
-      console.log('Tenant', Tenant)
 
       expect(Tenant).toBeNull()
     })

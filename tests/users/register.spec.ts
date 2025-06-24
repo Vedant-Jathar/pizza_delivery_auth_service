@@ -222,8 +222,6 @@ describe('POST /auth/register', () => {
         })
         .getMany()
 
-      console.log(tokens[0])
-
       expect(tokens).toHaveLength(1)
     })
   })

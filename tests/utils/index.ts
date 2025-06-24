@@ -22,7 +22,6 @@ export const isJwt = (token: string | null) => {
 
     return true
   } catch (err) {
-    console.log('The access token is not a jwt token')
     if (err) return false
   }
 }

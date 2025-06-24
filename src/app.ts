@@ -5,6 +5,7 @@ import logger from './config/logger'
 import authRouter from './routes/authRoutes'
 import cookieParser from 'cookie-parser'
 import tenantRouter from './routes/tenantRoutes'
+import userRouter from './routes/userRoutes'
 
 const app = express()
 app.use(express.static('public'))
@@ -13,6 +14,7 @@ app.use(cookieParser())
 
 app.use('/auth', authRouter)
 app.use('/tenants', tenantRouter)
+app.use('/users', userRouter)
 
 // eslint-disable-next-line @typescript-eslint/require-await
 app.get('/', async (req, res, next) => {

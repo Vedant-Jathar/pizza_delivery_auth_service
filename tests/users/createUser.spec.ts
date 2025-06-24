@@ -5,16 +5,19 @@ import { Role } from '../../src/constants'
 import request from 'supertest'
 import app from '../../src/app'
 import { User } from '../../src/entity/User'
+import { Tenant } from '../../src/entity/Tenant'
 
 describe('POST /users', () => {
   let connection: DataSource
   let jwks: ReturnType<typeof createJWKSMock>
   let userRepo: Repository<User>
+  let tenantRepo: Repository<Tenant>
 
   beforeAll(async () => {
     connection = await AppDataSource.initialize()
     jwks = createJWKSMock('http://localhost:5501')
     userRepo = connection.getRepository(User)
+    tenantRepo = connection.getRepository(Tenant)
   })
 
   beforeEach(async () => {
@@ -29,12 +32,18 @@ describe('POST /users', () => {
 
   describe('Happy path', () => {
     it('should persist the user in the databse', async () => {
+      const tenant = await tenantRepo.save({
+        name: 'Ten name',
+        address: 'ten address',
+      })
+
       const userData = {
         firstName: 'Vedant',
         lastName: 'Jathar',
         email: 'jatharvedant16@gmail.com',
         password: 'ved@123',
-        tenantId: 1,
+        tenantId: tenant.id,
+        role: Role.MANAGER,
       }
 
       // Create a access token that will be sent with the request:
@@ -55,6 +64,7 @@ describe('POST /users', () => {
         lastName: 'Jathar',
         email: 'jatharvedant16@gmail.com',
         password: 'ved@123',
+        role: Role.MANAGER,
       }
 
       // Create a access token that will be sent with the request:

@@ -33,6 +33,7 @@ export class AuthControllers {
         email,
         password,
         role: Role.CUSTOMER,
+        tenantId: NaN,
       })
       this.logger.info('User created successfully', { userDetails: user })
 
@@ -85,15 +86,15 @@ export class AuthControllers {
       })
 
       // Checking whether user exists:
-      const user = await this.userService.findUserByEmail(email)
+      const user = await this.userService.findUserByEmailWithPassword(email)
       if (!user) {
         const err = createHttpError(400, 'User does not exist')
         next(err)
       }
 
       // Checking whether the password is correct:
-      const hashedPassword = user.password
-      const hasPasswordMatched = await bcrypt.compare(password, hashedPassword)
+      const hashedPassword = user?.password
+      const hasPasswordMatched = await bcrypt.compare(password, hashedPassword!)
 
       if (!hasPasswordMatched) {
         const err = createHttpError(400, 'Incorrect password')
@@ -101,14 +102,14 @@ export class AuthControllers {
       }
 
       const payload: JwtPayload = {
-        sub: String(user.id),
-        role: String(user.role),
+        sub: String(user?.id),
+        role: String(user?.role),
       }
 
       const accessToken = this.tokenService.generateAccessToken(payload)
 
       const RefreshTokenInDatabase =
-        await this.tokenService.persistRefreshToken(user)
+        await this.tokenService.persistRefreshToken(user!)
 
       const refreshToken = this.tokenService.generateRefreshToken({
         ...payload,
@@ -130,11 +131,11 @@ export class AuthControllers {
       })
 
       this.logger.info('user logged in successfully', {
-        id: user.id,
+        id: user?.id,
       })
 
       res.status(200).json({
-        id: user.id,
+        id: user?.id,
         message: 'Login successful',
       })
     } catch (error) {

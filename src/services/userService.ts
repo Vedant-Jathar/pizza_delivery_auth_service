@@ -7,7 +7,14 @@ import bcrypt from 'bcrypt'
 export class UserService {
   constructor(private userRepository: Repository<User>) {}
 
-  async create({ firstName, lastName, email, password, role }: UserData) {
+  async create({
+    firstName,
+    lastName,
+    email,
+    password,
+    role,
+    tenantId,
+  }: UserData) {
     // Checking whether email already exists:
     const user = await this.userRepository.findOne({ where: { email } })
     if (user) {
@@ -26,6 +33,7 @@ export class UserService {
         email,
         password: hashedPassword,
         role,
+        tenant: tenantId ? { id: tenantId } : undefined,
       })
     } catch (err) {
       const error = createHttpError(
@@ -36,13 +44,17 @@ export class UserService {
     }
   }
 
-  async findUserByEmail(email: string) {
-    const user = await this.userRepository.find({
+  async findUserByEmailWithPassword(email: string) {
+    const user = await this.userRepository.findOne({
       where: {
         email,
       },
+      select: ['id', 'firstName', 'lastName', 'email', 'role', 'password'],
+      relations: {
+        tenant: true,
+      },
     })
-    return user[0]
+    return user
   }
 
   async findUserById(id: number) {

@@ -22,7 +22,7 @@
     "format:fix": "npx prettier . --write",
     "format:check": "npx prettier . --check",
     "eslint:fix": "npx eslint . --fix",
-    "eslint:check": "npx eslint .",
+    "eslint": "npx eslint .",
     "prepare": "husky",
     "start": "ts-node src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",

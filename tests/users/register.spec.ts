@@ -11,7 +11,9 @@ import { RefreshToken } from '../../src/entity/RefreshToken'
 describe('POST /auth/register', () => {
   let connection: DataSource
 
+
   beforeAll(async () => {
+    console.log("Hello");
     connection = await AppDataSource.initialize()
   })
 
@@ -177,7 +179,7 @@ describe('POST /auth/register', () => {
       const response = await request(app).post('/auth/register').send(userData)
 
       // Assert:
-      let accessToken = null 
+      let accessToken = null
       let refreshToken = null
       const cookies =
         (response.headers['set-cookie'] as unknown as string[]) ?? []

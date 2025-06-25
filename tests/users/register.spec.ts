@@ -177,7 +177,7 @@ describe('POST /auth/register', () => {
       const response = await request(app).post('/auth/register').send(userData)
 
       // Assert:
-      let accessToken = null
+      let accessToken = null 
       let refreshToken = null
       const cookies =
         (response.headers['set-cookie'] as unknown as string[]) ?? []

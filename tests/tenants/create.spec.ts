@@ -13,6 +13,8 @@ describe('POST /tenants', () => {
   let tenanatRepo: Repository<Tenant>
 
   beforeAll(async () => {
+    console.log("Hello");
+    
     connection = await AppDataSource.initialize()
     jwks = createJWKSMock('http://localhost:5501')
     tenanatRepo = connection.getRepository(Tenant)

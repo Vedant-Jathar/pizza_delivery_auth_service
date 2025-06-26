@@ -13,7 +13,8 @@ describe('POST /auth/register', () => {
 
 
   beforeAll(async () => {
-    console.log("Hello");
+    console.log("Hello guys");
+    console.log("Hello guys");
     connection = await AppDataSource.initialize()
   })
 

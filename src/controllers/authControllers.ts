@@ -6,7 +6,7 @@ import { Role } from '../constants'
 import { JwtPayload } from 'jsonwebtoken'
 import { TokenService } from '../services/tokenService'
 import createHttpError from 'http-errors'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 // import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {

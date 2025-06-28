@@ -1,11 +1,15 @@
 import { Repository } from 'typeorm'
 import { User } from '../entity/User'
-import { UserData } from '../types'
+import { createUserData, UserData } from '../types'
 import createHttpError from 'http-errors'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
+import { Tenant } from '../entity/Tenant'
 
 export class UserService {
-  constructor(private userRepository: Repository<User>) {}
+  constructor(
+    private userRepository: Repository<User>,
+    private tenantRepo: Repository<Tenant>,
+  ) {}
 
   async create({
     firstName,
@@ -20,6 +24,12 @@ export class UserService {
     if (user) {
       const error = createHttpError(400, 'Email already exists')
       throw error
+    }
+
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId! } })
+
+    if (!tenant) {
+      throw createHttpError(404, 'Tenant does not exist')
     }
 
     // Hashing the password using bcrypyt library:
@@ -64,5 +74,31 @@ export class UserService {
       },
     })
     return user
+  }
+
+  async updateById(
+    id: number,
+    { firstName, lastName, email, role, tenantId }: createUserData,
+  ) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    })
+
+    await this.userRepository.update(
+      { id },
+      {
+        firstName: firstName || user?.firstName,
+        lastName: lastName || user?.lastName,
+        email: email || user?.email,
+        role: role || user?.role,
+        tenant: tenantId ? { id: tenantId } : { id: user?.tenant.id },
+      },
+    )
+  }
+
+  async deleteById(id: number) {
+    await this.userRepository.delete({ id })
   }
 }

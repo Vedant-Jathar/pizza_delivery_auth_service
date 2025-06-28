@@ -51,3 +51,15 @@ export interface epxressResponseTenant {
   name: string
   address: string
 }
+
+export type createUserData = {
+  firstName: string
+  lastName: string
+  email: string
+  role: string
+  tenantId: number
+}
+
+export interface createUserRequest extends Request {
+  body: createUserData
+}

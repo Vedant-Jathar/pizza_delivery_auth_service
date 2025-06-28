@@ -18,6 +18,8 @@ const {
   REFRESH_TOKEN_EXPIRY,
   JWKS_URI,
   PRIVATE_KEY,
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
 } = process.env
 
 export const Config = {
@@ -33,4 +35,6 @@ export const Config = {
   REFRESH_TOKEN_EXPIRY,
   JWKS_URI,
   PRIVATE_KEY,
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
 }

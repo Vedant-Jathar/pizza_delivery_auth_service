@@ -6,7 +6,19 @@ export interface UserData {
   email: string
   password: string
   role: string
-  tenantId: number | null
+  tenantId?: number
+}
+
+export interface SanitizedUserData {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+}
+
+export interface sanitizedQuery {
+  currentPage: number
+  perPage: number
 }
 
 export interface RegisterUserRequest extends Request {

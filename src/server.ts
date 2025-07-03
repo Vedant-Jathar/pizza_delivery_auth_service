@@ -24,7 +24,6 @@ const startServer = async () => {
         email: Config.ADMIN_EMAIL!,
         password: Config.ADMIN_PASSWORD!,
         role: 'admin',
-        tenantId: null,
       })
     }
     console.log('Database connection successful')

@@ -31,6 +31,15 @@ export class TenantController {
     }
   }
 
+  async getAllTenants(req: Request, res: Response, next: NextFunction) {
+    try {
+      const allTenants = await this.tenantService.getAllTenant()
+      res.json(allTenants)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   async updateTenantById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params

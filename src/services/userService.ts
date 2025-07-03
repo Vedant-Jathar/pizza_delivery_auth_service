@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm'
 import { User } from '../entity/User'
-import { createUserData, UserData } from '../types'
+import { createUserData, sanitizedQuery, UserData } from '../types'
 import createHttpError from 'http-errors'
 import bcrypt from 'bcryptjs'
 import { Tenant } from '../entity/Tenant'
@@ -28,7 +28,7 @@ export class UserService {
 
     const tenant = await this.tenantRepo.findOne({ where: { id: tenantId! } })
 
-    if (!tenant) {
+    if (role === 'manager' && !tenant) {
       throw createHttpError(404, 'Tenant does not exist')
     }
 
@@ -72,8 +72,29 @@ export class UserService {
       where: {
         id,
       },
+      relations: {
+        tenant: true,
+      },
     })
     return user
+  }
+
+  async getAllUsers(sanitizedQuery: sanitizedQuery) {
+    const queryBuilder = this.userRepository.createQueryBuilder()
+
+    const result = await queryBuilder
+      .leftJoinAndSelect('User.tenant', 'tenant')
+      .skip((sanitizedQuery.currentPage - 1) * sanitizedQuery.perPage)
+      .take(sanitizedQuery.perPage)
+      .getManyAndCount()
+
+    return result
+
+    // return await this.userRepository.find({
+    //   relations: {
+    //     tenant: true
+    //   }
+    // })
   }
 
   async updateById(

@@ -48,6 +48,15 @@ router.get(
   },
 )
 
+router.get(
+  '/',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  async (req: Request, res: Response, next: NextFunction) => {
+    await userController.getAllUsers(req, res, next)
+  },
+)
+
 router.delete(
   '/:id',
   authenticate,

@@ -35,6 +35,14 @@ router.get(
     tenantController.getTenantById(req, res, next),
 )
 
+router.get(
+  '/',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getAllTenants(req, res, next),
+)
+
 router.patch(
   '/:id',
   authenticate,

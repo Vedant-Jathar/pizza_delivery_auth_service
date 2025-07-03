@@ -36,3 +36,18 @@ export const validate =
     // req.validatedData = parsed.data
     next()
   }
+
+export const validateRegisterData =
+  (schema: AnyZodObject) => (req: RegisterUserRequest, res: Response) => {
+    const parsed = schema.safeParse(req.body)
+
+    if (!parsed.success) {
+      res.status(400).json({
+        errors: parsed.error.flatten().fieldErrors,
+      })
+      return
+    }
+    return parsed.data
+    // req.validatedData = parsed.data
+    // next()
+  }

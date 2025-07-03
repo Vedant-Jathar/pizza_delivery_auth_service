@@ -33,7 +33,6 @@ export class AuthControllers {
         email,
         password,
         role: Role.CUSTOMER,
-        tenantId: NaN,
       })
       this.logger.info('User created successfully', { userDetails: user })
 

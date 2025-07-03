@@ -18,6 +18,10 @@ export class TenantService {
     })
   }
 
+  async getAllTenant() {
+    return await this.tenantRepo.find()
+  }
+
   async updateById(id: number, updatedData: epxressResponseTenant) {
     const tenant = await this.getTenantByid(id)
     return await this.tenantRepo.update(

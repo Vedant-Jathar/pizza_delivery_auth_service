@@ -4,6 +4,7 @@ import { Config } from '../config'
 import { Request } from 'express'
 import { AuthCookie } from '../types'
 
+// This middleware stores the payload of the acces token in "req.auth" if the access token is valid:
 export default expressjwt({
   secret: jwksClient.expressJwtSecret({
     jwksUri: Config.JWKS_URI!,

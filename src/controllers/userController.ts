@@ -2,6 +2,7 @@ import { NextFunction, Response, Request } from 'express'
 import { UserService } from '../services/userService'
 import { createUserRequest, RegisterUserRequest } from '../types'
 import createHttpError from 'http-errors'
+import { getUsersSchema } from '../validators/getUsersValidator'
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -48,6 +49,25 @@ export class UserController {
         next(createHttpError(404, 'User not found'))
       }
       res.json(user)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const sanitizedQuery = getUsersSchema.safeParse(req.query)
+      //Eg: sanitizedQuery = { success: true, data: { currentPage: 2, perPage: 7 } }
+
+      const [users, count] = await this.userService.getAllUsers(
+        sanitizedQuery.data!,
+      )
+      res.json({
+        currentPage: sanitizedQuery.data?.currentPage,
+        perPage: sanitizedQuery.data?.perPage,
+        data: users,
+        total: count,
+      })
     } catch (error) {
       next(error)
     }

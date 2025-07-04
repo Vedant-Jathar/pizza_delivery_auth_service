@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm'
+import { Brackets, Repository } from 'typeorm'
 import { User } from '../entity/User'
 import { createUserData, sanitizedQuery, UserData } from '../types'
 import createHttpError from 'http-errors'
@@ -80,12 +80,31 @@ export class UserService {
   }
 
   async getAllUsers(sanitizedQuery: sanitizedQuery) {
-    const queryBuilder = this.userRepository.createQueryBuilder()
+    const queryBuilder = this.userRepository.createQueryBuilder('users')
+    console.log(sanitizedQuery)
+
+    const searchTerm = `%${sanitizedQuery.q}%`
+    if (sanitizedQuery.q) {
+      queryBuilder.where(
+        new Brackets((qb) => {
+          qb.where('CONCAT(users.firstName,\' \',users."lastName") ILike :q', {
+            q: searchTerm,
+          }).orWhere('users.email ILike :q', { q: searchTerm })
+        }),
+      )
+    }
+
+    if (sanitizedQuery.role) {
+      queryBuilder.andWhere('users.role Like :role', {
+        role: sanitizedQuery.role,
+      })
+    }
 
     const result = await queryBuilder
-      .leftJoinAndSelect('User.tenant', 'tenant')
+      .leftJoinAndSelect('users.tenant', 'tenant')
       .skip((sanitizedQuery.currentPage - 1) * sanitizedQuery.perPage)
       .take(sanitizedQuery.perPage)
+      .orderBy('users.id', 'DESC')
       .getManyAndCount()
 
     return result

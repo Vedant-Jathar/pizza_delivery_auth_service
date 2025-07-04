@@ -56,8 +56,11 @@ export class UserController {
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log('He;lo')
+
       const sanitizedQuery = getUsersSchema.safeParse(req.query)
       //Eg: sanitizedQuery = { success: true, data: { currentPage: 2, perPage: 7 } }
+      console.log('sanitizedQuery', sanitizedQuery)
 
       const [users, count] = await this.userService.getAllUsers(
         sanitizedQuery.data!,

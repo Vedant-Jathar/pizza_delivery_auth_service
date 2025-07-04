@@ -19,6 +19,8 @@ export interface SanitizedUserData {
 export interface sanitizedQuery {
   currentPage: number
   perPage: number
+  q?: string
+  role?: string
 }
 
 export interface RegisterUserRequest extends Request {

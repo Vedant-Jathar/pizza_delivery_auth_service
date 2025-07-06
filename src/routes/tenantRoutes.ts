@@ -28,6 +28,14 @@ router.post(
 )
 
 router.get(
+  '/all',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getAllTenantsWithoutPagination(req, res, next),
+)
+
+router.get(
   '/:id',
   authenticate,
   canAccess([Role.ADMIN]),
@@ -47,6 +55,7 @@ router.patch(
   '/:id',
   authenticate,
   canAccess([Role.ADMIN]),
+  validate(tenantDataSchema),
   (req: Request, res: Response, next: NextFunction) =>
     tenantController.updateTenantById(req, res, next),
 )

@@ -2,6 +2,7 @@ import { Logger } from 'winston'
 import { TenantService } from '../services/tenantService'
 import { Request, Response, NextFunction } from 'express'
 import { epxressResponseTenant, TenantData } from '../types'
+import { getTenantsSchema } from '../validators/getTenantsValidator'
 
 export class TenantController {
   constructor(
@@ -33,8 +34,40 @@ export class TenantController {
 
   async getAllTenants(req: Request, res: Response, next: NextFunction) {
     try {
-      const allTenants = await this.tenantService.getAllTenant()
+      const sanitizedQuery = getTenantsSchema.safeParse(req.query)
+      if (!sanitizedQuery.success) {
+        res.status(400).json({
+          errors: sanitizedQuery.error,
+        })
+        return
+      }
+      const [allTenants, total] = await this.tenantService.getAllTenant(
+        sanitizedQuery.data,
+      )
+      res.json({
+        currentPage: sanitizedQuery.data?.currentPage,
+        perPage: sanitizedQuery.data?.perPage,
+        data: allTenants,
+        total,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getAllTenantsWithoutPagination(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      console.log('Hello')
+
+      const allTenants =
+        await this.tenantService.getAllTenantsWithoutPagination()
+      console.log('allTenants', allTenants)
       res.json(allTenants)
+      return
     } catch (error) {
       next(error)
     }

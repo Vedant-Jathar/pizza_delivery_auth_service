@@ -5,5 +5,5 @@ export const updateUserSchema = z.object({
   lastName: z.string(),
   email: z.string().email('Email is not valid'),
   role: z.string(),
-  tenantId: z.number(),
+  tenantId: z.number().optional(),
 })

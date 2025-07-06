@@ -133,7 +133,7 @@ export class UserService {
         lastName: lastName || user?.lastName,
         email: email || user?.email,
         role: role || user?.role,
-        tenant: tenantId ? { id: tenantId } : { id: user?.tenant.id },
+        tenant: tenantId ? { id: tenantId } : null,
       },
     )
   }

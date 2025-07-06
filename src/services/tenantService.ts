@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm'
 import { Tenant } from '../entity/Tenant'
-import { epxressResponseTenant, TenantData } from '../types'
+import { epxressResponseTenant, sanitizedQuery, TenantData } from '../types'
 
 export class TenantService {
   constructor(private tenantRepo: Repository<Tenant>) {}
@@ -18,8 +18,28 @@ export class TenantService {
     })
   }
 
-  async getAllTenant() {
-    return await this.tenantRepo.find()
+  async getAllTenant(sanitizedQuery: sanitizedQuery) {
+    const { currentPage, perPage } = sanitizedQuery
+    const queryBuilder = this.tenantRepo.createQueryBuilder('tenant')
+
+    if (sanitizedQuery.q) {
+      const searchTerm = `%${sanitizedQuery.q}%`
+      queryBuilder
+        .where(`tenant.name ILike :q`, { q: searchTerm })
+        .orWhere('tenant.address ILike :q', { q: searchTerm })
+    }
+
+    const result = await queryBuilder
+      .skip((currentPage - 1) * perPage)
+      .take(perPage)
+      .orderBy('tenant.id', 'DESC')
+      .getManyAndCount()
+
+    return result
+  }
+
+  async getAllTenantsWithoutPagination() {
+    return this.tenantRepo.find()
   }
 
   async updateById(id: number, updatedData: epxressResponseTenant) {

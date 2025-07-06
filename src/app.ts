@@ -1,12 +1,12 @@
 import 'reflect-metadata'
-import express, { NextFunction, Request, Response } from 'express'
-import createHttpError, { HttpError } from 'http-errors'
-import logger from './config/logger'
+import express, { Request, Response } from 'express'
+import createHttpError from 'http-errors'
 import authRouter from './routes/authRoutes'
 import cookieParser from 'cookie-parser'
 import tenantRouter from './routes/tenantRoutes'
 import userRouter from './routes/userRoutes'
 import cors from 'cors'
+import { globalErrorHandler } from './middlewares/globalErrorHandler'
 
 const app = express()
 app.use(
@@ -37,21 +37,6 @@ app.get('/vedant', (req: Request, res: Response) => {
   })
 })
 
-// Global error handler(Should be at the end)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-  logger.error(err.message)
-
-  res.status(err.statusCode || err.status || 500).json({
-    errors: [
-      {
-        type: err.name,
-        message: err.message,
-        path: '',
-        location: '',
-      },
-    ],
-  })
-})
+app.use(globalErrorHandler)
 
 export default app

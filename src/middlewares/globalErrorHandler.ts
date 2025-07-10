@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { Request, Response } from 'express'
 import logger from '../config/logger'
 
- 
 export const globalErrorHandler = (
   err: HttpError,
   req: Request,

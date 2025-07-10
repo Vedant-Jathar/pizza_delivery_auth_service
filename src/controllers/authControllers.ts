@@ -103,6 +103,7 @@ export class AuthControllers {
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        tenantId: String(user?.tenant?.id),
       }
 
       const accessToken = this.tokenService.generateAccessToken(payload)
@@ -163,6 +164,7 @@ export class AuthControllers {
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        tenantId: String(user?.tenant?.id),
       }
 
       const accessToken = this.tokenService.generateAccessToken(payload)

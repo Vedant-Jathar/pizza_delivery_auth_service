@@ -39,6 +39,9 @@ export class AuthControllers {
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
+        firstName,
+        lastName,
+        email,
       }
 
       // Generating access token:
@@ -87,7 +90,7 @@ export class AuthControllers {
       // Checking whether user exists:
       const user = await this.userService.findUserByEmailWithPassword(email)
       if (!user) {
-        const err = createHttpError(400, 'User does not exist')
+        const err = createHttpError(400, 'Invalid credentials')
         next(err)
       }
 
@@ -96,13 +99,16 @@ export class AuthControllers {
       const hasPasswordMatched = await bcrypt.compare(password, hashedPassword!)
 
       if (!hasPasswordMatched) {
-        const err = createHttpError(400, 'Incorrect password')
+        const err = createHttpError(400, 'Invalid credentials')
         throw err
       }
 
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.email,
         tenantId: String(user?.tenant?.id),
       }
 
@@ -145,6 +151,8 @@ export class AuthControllers {
 
   async self(req: Auth, res: Response, next: NextFunction) {
     try {
+      console.log('req.auth', req.auth)
+
       const user = await this.userService.findUserById(Number(req.auth.sub))
 
       if (!user) {
@@ -164,6 +172,9 @@ export class AuthControllers {
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.email,
         tenantId: String(user?.tenant?.id),
       }
 

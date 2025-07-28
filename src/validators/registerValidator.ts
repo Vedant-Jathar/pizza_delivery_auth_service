@@ -14,7 +14,7 @@ export const registerSchema = z.object({
     .email('Invalid email format'),
   password: z
     .string()
-    .nonempty('Password cannor be empty')
+    .nonempty('Password cannot be empty')
     .min(6, 'Min 6 characters required'),
 })
 

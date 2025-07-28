@@ -61,11 +61,8 @@ export class TenantController {
     next: NextFunction,
   ) {
     try {
-      console.log('Hello')
-
       const allTenants =
         await this.tenantService.getAllTenantsWithoutPagination()
-      console.log('allTenants', allTenants)
       res.json(allTenants)
       return
     } catch (error) {

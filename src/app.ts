@@ -7,11 +7,14 @@ import tenantRouter from './routes/tenantRoutes'
 import userRouter from './routes/userRoutes'
 import cors from 'cors'
 import { globalErrorHandler } from './middlewares/globalErrorHandler'
-
+import { Config } from './config'
 const app = express()
+
+const ALLOWED_DOMAINS = [Config.FRONTEND_CLIENT_UI, Config.FRONTEND_ADMIN_UI]
+
 app.use(
   cors({
-    origin: ['http://localhost:5173'],
+    origin: ALLOWED_DOMAINS as string[],
     credentials: true,
   }),
 )

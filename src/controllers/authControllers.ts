@@ -7,6 +7,7 @@ import { JwtPayload } from 'jsonwebtoken'
 import { TokenService } from '../services/tokenService'
 import createHttpError from 'http-errors'
 import bcrypt from 'bcryptjs'
+import { Config } from '../config'
 // import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {
@@ -57,14 +58,14 @@ export class AuthControllers {
       })
 
       res.cookie('accessToken', accessToken, {
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
         httpOnly: true,
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60,
       })
 
       res.cookie('refreshToken', refreshToken, {
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
         httpOnly: true,
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 365,
@@ -126,14 +127,14 @@ export class AuthControllers {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.cookie('refreshToken', refreshToken, {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       this.logger.info('user logged in successfully', {
@@ -195,14 +196,14 @@ export class AuthControllers {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.cookie('refreshToken', refreshToken, {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.json({})

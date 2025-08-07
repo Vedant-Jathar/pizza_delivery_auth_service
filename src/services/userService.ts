@@ -1,11 +1,15 @@
-import { Repository } from 'typeorm'
+import { Brackets, Repository } from 'typeorm'
 import { User } from '../entity/User'
-import { UserData } from '../types'
+import { createUserData, sanitizedQuery, UserData } from '../types'
 import createHttpError from 'http-errors'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
+import { Tenant } from '../entity/Tenant'
 
 export class UserService {
-  constructor(private userRepository: Repository<User>) {}
+  constructor(
+    private userRepository: Repository<User>,
+    private tenantRepo: Repository<Tenant>,
+  ) {}
 
   async create({
     firstName,
@@ -20,6 +24,12 @@ export class UserService {
     if (user) {
       const error = createHttpError(400, 'Email already exists')
       throw error
+    }
+
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId! } })
+
+    if (role === 'manager' && !tenant) {
+      throw createHttpError(404, 'Tenant does not exist')
     }
 
     // Hashing the password using bcrypyt library:
@@ -62,7 +72,73 @@ export class UserService {
       where: {
         id,
       },
+      relations: {
+        tenant: true,
+      },
     })
     return user
+  }
+
+  async getAllUsers(sanitizedQuery: sanitizedQuery) {
+    const queryBuilder = this.userRepository.createQueryBuilder('users')
+    console.log(sanitizedQuery)
+
+    const searchTerm = `%${sanitizedQuery.q}%`
+    if (sanitizedQuery.q) {
+      queryBuilder.where(
+        new Brackets((qb) => {
+          qb.where('CONCAT(users.firstName,\' \',users."lastName") ILike :q', {
+            q: searchTerm,
+          }).orWhere('users.email ILike :q', { q: searchTerm })
+        }),
+      )
+    }
+
+    if (sanitizedQuery.role) {
+      queryBuilder.andWhere('users.role Like :role', {
+        role: sanitizedQuery.role,
+      })
+    }
+
+    const result = await queryBuilder
+      .leftJoinAndSelect('users.tenant', 'tenant')
+      .skip((sanitizedQuery.currentPage - 1) * sanitizedQuery.perPage)
+      .take(sanitizedQuery.perPage)
+      .orderBy('users.id', 'DESC')
+      .getManyAndCount()
+
+    return result
+
+    // return await this.userRepository.find({
+    //   relations: {
+    //     tenant: true
+    //   }
+    // })
+  }
+
+  async updateById(
+    id: number,
+    { firstName, lastName, email, role, tenantId }: createUserData,
+  ) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    })
+
+    await this.userRepository.update(
+      { id },
+      {
+        firstName: firstName || user?.firstName,
+        lastName: lastName || user?.lastName,
+        email: email || user?.email,
+        role: role || user?.role,
+        tenant: tenantId ? { id: tenantId } : null,
+      },
+    )
+  }
+
+  async deleteById(id: number) {
+    await this.userRepository.delete({ id })
   }
 }

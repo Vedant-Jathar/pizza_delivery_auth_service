@@ -10,7 +10,6 @@ import { canAccess } from '../middlewares/canAccess'
 import { Role } from '../constants'
 import { tenantDataSchema } from '../validators/tenantValidator'
 import { validate } from '../validators/registerValidator'
-
 const router = Router()
 
 const tenantController = new TenantController(
@@ -27,6 +26,10 @@ router.post(
     tenantController.create(req, res, next),
 )
 
+router.get('/all', (req: Request, res: Response, next: NextFunction) =>
+  tenantController.getAllTenantsWithoutPagination(req, res, next),
+)
+
 router.get(
   '/:id',
   authenticate,
@@ -35,10 +38,19 @@ router.get(
     tenantController.getTenantById(req, res, next),
 )
 
+router.get(
+  '/',
+  authenticate,
+  canAccess([Role.ADMIN]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getAllTenants(req, res, next),
+)
+
 router.patch(
   '/:id',
   authenticate,
   canAccess([Role.ADMIN]),
+  validate(tenantDataSchema),
   (req: Request, res: Response, next: NextFunction) =>
     tenantController.updateTenantById(req, res, next),
 )

@@ -6,7 +6,8 @@ import { Role } from '../constants'
 import { JwtPayload } from 'jsonwebtoken'
 import { TokenService } from '../services/tokenService'
 import createHttpError from 'http-errors'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
+import { Config } from '../config'
 // import { registerSchema } from '../validators/registerValidator'
 
 export class AuthControllers {
@@ -33,13 +34,15 @@ export class AuthControllers {
         email,
         password,
         role: Role.CUSTOMER,
-        tenantId: NaN,
       })
       this.logger.info('User created successfully', { userDetails: user })
 
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
+        firstName,
+        lastName,
+        email,
       }
 
       // Generating access token:
@@ -55,14 +58,14 @@ export class AuthControllers {
       })
 
       res.cookie('accessToken', accessToken, {
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
         httpOnly: true,
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60,
       })
 
       res.cookie('refreshToken', refreshToken, {
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
         httpOnly: true,
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 365,
@@ -88,7 +91,7 @@ export class AuthControllers {
       // Checking whether user exists:
       const user = await this.userService.findUserByEmailWithPassword(email)
       if (!user) {
-        const err = createHttpError(400, 'User does not exist')
+        const err = createHttpError(400, 'Invalid credentials')
         next(err)
       }
 
@@ -97,13 +100,17 @@ export class AuthControllers {
       const hasPasswordMatched = await bcrypt.compare(password, hashedPassword!)
 
       if (!hasPasswordMatched) {
-        const err = createHttpError(400, 'Incorrect password')
+        const err = createHttpError(400, 'Invalid credentials')
         throw err
       }
 
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.email,
+        tenantId: String(user?.tenant?.id),
       }
 
       const accessToken = this.tokenService.generateAccessToken(payload)
@@ -120,14 +127,14 @@ export class AuthControllers {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.cookie('refreshToken', refreshToken, {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       this.logger.info('user logged in successfully', {
@@ -145,6 +152,8 @@ export class AuthControllers {
 
   async self(req: Auth, res: Response, next: NextFunction) {
     try {
+      console.log('req.auth', req.auth)
+
       const user = await this.userService.findUserById(Number(req.auth.sub))
 
       if (!user) {
@@ -164,6 +173,10 @@ export class AuthControllers {
       const payload: JwtPayload = {
         sub: String(user?.id),
         role: String(user?.role),
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.email,
+        tenantId: String(user?.tenant?.id),
       }
 
       const accessToken = this.tokenService.generateAccessToken(payload)
@@ -183,14 +196,14 @@ export class AuthControllers {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.cookie('refreshToken', refreshToken, {
         sameSite: 'strict',
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365,
-        domain: 'localhost',
+        domain: Config.MAIN_DOMAIN,
       })
 
       res.json({})

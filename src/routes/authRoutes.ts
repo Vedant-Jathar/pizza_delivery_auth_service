@@ -15,12 +15,16 @@ import { TokenService } from '../services/tokenService'
 import { RefreshToken } from '../entity/RefreshToken'
 import validaterefreshToken from '../middlewares/validaterefreshToken'
 import parserefreshToken from '../middlewares/parserefreshToken'
+import { Tenant } from '../entity/Tenant'
 // import { registerSchema, validate } from '../validators/registerValidator'
 
 const authRouter = Router()
 
 const authController = new AuthControllers(
-  new UserService(AppDataSource.getRepository(User)),
+  new UserService(
+    AppDataSource.getRepository(User),
+    AppDataSource.getRepository(Tenant),
+  ),
   logger,
   new TokenService(AppDataSource.getRepository(RefreshToken)),
 )
